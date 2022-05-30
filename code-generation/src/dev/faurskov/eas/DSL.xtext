@@ -1,0 +1,24 @@
+grammar dev.faurskov.eas.DSL with org.eclipse.xtext.common.Terminals
+
+import "http://www.eclipse.org/emf/2002/Ecore" as ecore
+
+generate dSL "http://www.faurskov.dev/eas/DSL"
+
+Model:
+	device=Device locatedAt=LocatedAt 'uses' wifi=WiFi;
+
+Device:
+	'device' name=STRING 
+;
+
+LocatedAt: 
+	'located' 'at' latitude=LOCATION ',' longitude=LOCATION
+;
+
+WiFi:
+	'wifi' ssid=STRING 'with' ('pass'|'password') password=STRING
+;
+
+terminal LOCATION returns ecore::EBigDecimal:
+	 (('0'..'9')+ ('.' ('0'..'9')*))
+;

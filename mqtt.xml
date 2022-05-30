@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_2.dtd'>
+<nta>
+	<declaration>chan readyForConnection;
+chan authenticateSession;
+chan subscribeToTopic;
+chan publishToTopic;
+chan subscribedMessage;
+chan unsubscribeFromTopic;
+
+int receivedCount = 0;
+int sentCount = 0;
+bool subscribedToTopic = false;</declaration>
+	<template>
+		<name x="5" y="5">Device</name>
+		<declaration>// Place local declarations here.</declaration>
+		<location id="id0" x="-833" y="-340">
+			<name x="-850" y="-323">initial</name>
+		</location>
+		<location id="id1" x="-612" y="-340">
+			<name x="-671" y="-314">ready_to_authenticate</name>
+		</location>
+		<location id="id2" x="-391" y="-340">
+			<name x="-416" y="-314">authenticated</name>
+		</location>
+		<location id="id3" x="-391" y="-442">
+			<name x="-401" y="-476">message_published</name>
+		</location>
+		<location id="id4" x="-221" y="-306">
+			<name x="-231" y="-340">done</name>
+		</location>
+		<init ref="id0"/>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id4"/>
+			<label kind="guard" x="-331" y="-357">sentCount == 50</label>
+		</transition>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id2"/>
+			<label kind="assignment" x="-289" y="-399">sentCount++</label>
+			<nail x="-289" y="-391"/>
+		</transition>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id3"/>
+			<label kind="guard" x="-510" y="-425">sentCount &lt; 50</label>
+			<label kind="synchronisation" x="-510" y="-408">publishToTopic!</label>
+		</transition>
+		<transition>
+			<source ref="id1"/>
+			<target ref="id2"/>
+			<label kind="synchronisation" x="-578" y="-357">authenticateSession?</label>
+		</transition>
+		<transition>
+			<source ref="id0"/>
+			<target ref="id1"/>
+			<label kind="synchronisation" x="-807" y="-357">readyForConnection?</label>
+		</transition>
+	</template>
+	<template>
+		<name>MQTTBroker</name>
+		<location id="id5" x="-450" y="-450">
+			<name x="-467" y="-416">awaiting</name>
+		</location>
+		<location id="id6" x="-255" y="-450">
+			<name x="-265" y="-484">incoming_connection</name>
+		</location>
+		<location id="id7" x="-382" y="-620">
+			<name x="-357" y="-629">topic_subscribed_to</name>
+		</location>
+		<location id="id8" x="-654" y="-399">
+			<name x="-798" y="-408">message_received</name>
+		</location>
+		<init ref="id5"/>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id5"/>
+			<label kind="synchronisation" x="-365" y="-510">unsubscribeFromTopic?</label>
+			<nail x="-442" y="-459"/>
+			<nail x="-391" y="-510"/>
+			<nail x="-365" y="-493"/>
+		</transition>
+		<transition>
+			<source ref="id8"/>
+			<target ref="id5"/>
+			<label kind="guard" x="-731" y="-518">subscribedToTopic == false</label>
+			<nail x="-629" y="-501"/>
+		</transition>
+		<transition>
+			<source ref="id8"/>
+			<target ref="id5"/>
+			<label kind="guard" x="-654" y="-323">subscribedToTopic == true</label>
+			<label kind="synchronisation" x="-612" y="-297">subscribedMessage!</label>
+			<nail x="-544" y="-331"/>
+		</transition>
+		<transition>
+			<source ref="id7"/>
+			<target ref="id5"/>
+			<label kind="guard" x="-764" y="-629">subscribedToTopic == true</label>
+			<nail x="-569" y="-620"/>
+		</transition>
+		<transition>
+			<source ref="id6"/>
+			<target ref="id5"/>
+			<label kind="synchronisation" x="-331" y="-297">authenticateSession!</label>
+			<nail x="-255" y="-297"/>
+		</transition>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id8"/>
+			<label kind="synchronisation" x="-637" y="-450">publishToTopic?</label>
+		</transition>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id7"/>
+			<label kind="synchronisation" x="-399" y="-569">subscribeToTopic?</label>
+		</transition>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id6"/>
+			<label kind="synchronisation" x="-408" y="-442">readyForConnection!</label>
+		</transition>
+	</template>
+	<template>
+		<name>Processor</name>
+		<location id="id9" x="-391" y="-93">
+			<name x="-408" y="-76">initial</name>
+		</location>
+		<location id="id10" x="-195" y="-93">
+			<name x="-331" y="-76">ready_to_authenticate</name>
+		</location>
+		<location id="id11" x="0" y="-93">
+			<name x="-119" y="-85">authenticated</name>
+		</location>
+		<location id="id12" x="25" y="-221">
+			<name x="67" y="-230">subscribed_to_topic</name>
+		</location>
+		<location id="id13" x="357" y="-170">
+			<name x="348" y="-204">exit</name>
+		</location>
+		<init ref="id9"/>
+		<transition>
+			<source ref="id11"/>
+			<target ref="id13"/>
+			<label kind="guard" x="195" y="-110">receivedCount &gt;= 5</label>
+			<label kind="synchronisation" x="178" y="-127">unsubscribeFromTopic!</label>
+			<label kind="assignment" x="170" y="-93">subscribedToTopic = false</label>
+		</transition>
+		<transition>
+			<source ref="id11"/>
+			<target ref="id11"/>
+			<label kind="guard" x="-102" y="59">subscribedToTopic == true &amp;&amp; receivedCount &lt; 5</label>
+			<label kind="synchronisation" x="8" y="34">subscribedMessage?</label>
+			<label kind="assignment" x="102" y="-25">receivedCount++</label>
+			<nail x="135" y="-67"/>
+			<nail x="59" y="26"/>
+		</transition>
+		<transition>
+			<source ref="id12"/>
+			<target ref="id11"/>
+			<nail x="136" y="-153"/>
+		</transition>
+		<transition>
+			<source ref="id11"/>
+			<target ref="id12"/>
+			<label kind="guard" x="-204" y="-161">subscribedToTopic == false</label>
+			<label kind="synchronisation" x="-136" y="-195">subscribeToTopic!</label>
+			<label kind="assignment" x="-187" y="-178">subscribedToTopic = true</label>
+		</transition>
+		<transition>
+			<source ref="id10"/>
+			<target ref="id11"/>
+			<label kind="synchronisation" x="-170" y="-110">authenticateSession?</label>
+		</transition>
+		<transition>
+			<source ref="id9"/>
+			<target ref="id10"/>
+			<label kind="synchronisation" x="-374" y="-110">readyForConnection?</label>
+		</transition>
+	</template>
+	<system>device = Device();
+broker = MQTTBroker();
+processor = Processor();
+system device, broker, processor;</system>
+	<queries>
+		<query>
+			<formula>E&lt;&gt; sentCount == 1 imply device.authenticated</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>E&lt;&gt; sentCount == 0 imply not device.authenticated</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>E&lt;&gt; receivedCount == 1 imply processor.authenticated</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>A[] receivedCount &gt;= 5 imply (processor.exit or processor.authenticated)</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>A[] sentCount == 50 imply (device.done or device.authenticated)</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>A[] processor.exit imply subscribedToTopic == false</formula>
+			<comment></comment>
+		</query>
+	</queries>
+</nta>

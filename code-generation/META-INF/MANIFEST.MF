@@ -1,0 +1,29 @@
+Manifest-Version: 1.0
+Automatic-Module-Name: dev.faurskov.eas
+Bundle-ManifestVersion: 2
+Bundle-Name: dev.faurskov.eas
+Bundle-Vendor: My Company
+Bundle-Version: 1.0.0.qualifier
+Bundle-SymbolicName: dev.faurskov.eas; singleton:=true
+Bundle-ActivationPolicy: lazy
+Require-Bundle: org.eclipse.xtext,
+ org.eclipse.xtext.xbase,
+ org.eclipse.equinox.common;bundle-version="3.5.0",
+ org.eclipse.emf.ecore,
+ org.eclipse.xtext.xbase.lib;bundle-version="2.14.0",
+ org.eclipse.xtext.util,
+ org.eclipse.emf.common,
+ org.antlr.runtime;bundle-version="[3.2.0,3.2.1)"
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+Export-Package: dev.faurskov.eas.serializer,
+ dev.faurskov.eas.dSL.util,
+ dev.faurskov.eas.dSL.impl,
+ dev.faurskov.eas.scoping,
+ dev.faurskov.eas,
+ dev.faurskov.eas.services,
+ dev.faurskov.eas.dSL,
+ dev.faurskov.eas.parser.antlr,
+ dev.faurskov.eas.generator,
+ dev.faurskov.eas.parser.antlr.internal,
+ dev.faurskov.eas.validation
+Import-Package: org.apache.log4j
