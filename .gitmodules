@@ -1,0 +1,6 @@
+[submodule "frontend"]
+	path = frontend
+	url = https://github.com/jazerix/remix-eas.git
+[submodule "processor"]
+	path = processor
+	url = https://github.com/jazerix/eas-broker.git
