@@ -16,7 +16,7 @@
 #define DeviceName "%DEVICE%"
 #define BufferSize 50
 #define LAT "%LATITUDE%"
-#define LNG "%LONGITUDE"
+#define LNG "%LONGITUDE%"
 #define WiFiSSID "%SSID%"
 #define WiFiPass "%PASS%"
 
